@@ -94,18 +94,37 @@
 
             // #2-3 失敗捕捉
 
-            promiseSetTimeout(0)
-              .then((res) => {
-                console.log(res);
-              })
-              .catch((err) => console.log(err));
+            // promiseSetTimeout(0)
+            //   .then((res) => {
+            //     console.log(res);
+            //   })
+            //   .catch((err) => console.log(err));
 
             // #3 實戰取得遠端資料
             // #3-1
             // https://github.com/axios/axios
+            // console.dir(axios);
+            // axios
+            //   .get("https://randomuser.me/api")
+            //   .then((res) => {
+            //     console.log(res);
+            //     return axios.get("https://randomuser.me/api");
+            //   })
+            //   .then((res) => {
+            //     console.log(res);
+            //   });
 
             // #3-2 記得捕捉錯誤，Axios 錯誤捕捉技巧
             // https://randomuser.me/
+            // axios
+            //   .get("https://randomuser.me/ai")
+            //   .then((res) => {
+            //     console.log(res);
+            //   })
+            //   .catch((err) => {
+            //     // console.log(err);
+            //     alert(err.message);
+            //   });
           </script>
           <!-- 🙇🙇練習結束🙇🙇 -->
         </main>
