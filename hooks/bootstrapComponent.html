@@ -32,12 +32,12 @@
           </div>
           <!-- 🔥🔥練習開始🔥🔥 -->
           <!-- 原生 Bootstrap  --><!-- Button trigger modal -->
-          <button type="button" class="btn btn-primary" id="btnModal">
+          <!-- <button type="button" class="btn btn-primary" id="btnModal">
             Launch demo modal
-          </button>
+          </button> -->
 
           <!-- Modal -->
-          <div
+          <!-- <div
             class="modal fade"
             id="exampleModal"
             tabindex="-1"
@@ -72,13 +72,13 @@
                 </div>
               </div>
             </div>
-          </div>
+          </div> -->
           <script>
             // ## Modal
             // // #1 生成實體
-            console.log(bootstrap);
-            const myModal = new bootstrap.Modal("#exampleModal");
-            console.log(myModal);
+            // console.log(bootstrap);
+            // const myModal = new bootstrap.Modal("#exampleModal");
+            // console.log(myModal);
 
             // // #2 套用實體方法
             //.show() 展開 ,hide() 關閉
@@ -90,37 +90,59 @@
             //   }, 1000);
             // }, 1000);
 
-            const btn = document.querySelector("#btnModal");
+            // const btn = document.querySelector("#btnModal");
 
-            btn.addEventListener("click", () => {
-              myModal.show();
-            });
+            // btn.addEventListener("click", () => {
+            //   myModal.show();
+            // });
 
-            // #3 套用監聽
-            const myModalEl = document.getElementById("exampleModal");
-            myModalEl.addEventListener("shown.bs.modal", (event) => {
-              console.log("Modal 已經完全展開");
-            });
+            // // #3 套用監聽
+            // const myModalEl = document.getElementById("exampleModal");
+            // myModalEl.addEventListener("shown.bs.modal", (event) => {
+            //   console.log("Modal 已經完全展開");
+            // });
           </script>
           <!--  -->
           <div id="root"></div>
           <script type="text/babel">
             const { useState, useEffect } = React;
-
+            let myModal;
             const App = () => {
               // #1 在 React 中套用 Bootstrap 語法
               // #1-1 錯誤寫法（DOM 尚未生成）
+              // const myModal = new bootstrap.Modal("#newModal");
+              // setTimeout(() => {
+              //   myModal.show();
+              // }, 1000);
 
               // #1-2 DOM 已經生成
-
+              // useEffect(() => {
+              //   const myModal = new bootstrap.Modal("#newModal");
+              //   setTimeout(() => {
+              //     myModal.show();
+              //   }, 1000);
+              // }, []);
               // #2 錯誤寫法
               // 2-1 作用域錯誤
+              const openModal = () => {
+                myModal.show();
+              };
 
+              useEffect(() => {
+                myModal = new bootstrap.Modal("#newModal");
+                // setTimeout(() => {
+                //   myModal.show();
+                // }, 1000);
+              });
               // 2-2 操作
 
               return (
                 <>
-                  <button type="button" className="btn btn-primary">
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={openModal}
+                  >
                     打開 Modal
                   </button>
                   <div className="modal fade" tabIndex="-1" id="newModal">
