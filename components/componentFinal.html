@@ -65,17 +65,33 @@
                               </div>
                               <div className="card-body">
                                 <div className="row row-cols-3">
-                                  // city.weatherElement[0] wx //
-                                  city.weatherElement[4] pop
+                                  {/* city.weatherElement[0] wx */}
+                                  {/*   city.weatherElement[4] pop */}
                                   {city.weatherElement[0].time.map(
                                     (time, index) => {
                                       return (
                                         <div className="col" key={index}>
-                                          <div className="h4 my-2">23日</div>
-                                          下午6:00
+                                          <div className="h4 my-2">
+                                            {new Date(
+                                              time.startTime
+                                            ).toLocaleDateString(undefined, {
+                                              day: "numeric",
+                                            })}
+                                          </div>
+                                          {new Date(
+                                            time.startTime
+                                          ).toLocaleString(undefined, {
+                                            hour: "numeric",
+                                            minute: "numeric",
+                                          })}
                                           <br />
                                           ~ <br />
-                                          上午6:00
+                                          {new Date(
+                                            time.endTime
+                                          ).toLocaleString(undefined, {
+                                            hour: "numeric",
+                                            minute: "numeric",
+                                          })}
                                           <img
                                             src={`./weatherIcon/${time.parameter.parameterName}.svg`}
                                           />
