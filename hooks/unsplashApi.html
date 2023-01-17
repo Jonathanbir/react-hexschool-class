@@ -38,9 +38,16 @@
             const api = "https://api.unsplash.com/search/photos/";
             const accessKey = "GAvxZ9VesndxTx_9NftqgOtZffnTB0YhfGiWGDJA-bs";
 
-            const Card = ({ item }) => {
+            const Card = ({ item, getSinglePhoto }) => {
               return (
-                <div className="card">
+                <a
+                  href="#"
+                  className="card"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    getSinglePhoto(item.id);
+                  }}
+                >
                   <img
                     className="card-img img-cover"
                     width="100%"
@@ -48,7 +55,7 @@
                     src={`${item.urls.raw}&w=600&q=80`}
                     alt=""
                   />
-                </div>
+                </a>
               );
             };
 
@@ -72,6 +79,9 @@
             // - 製作畫面的讀取效果
             // - 套用狀態
             // #3 取得單張照片,並顯示在畫面上
+            // - 打開 Modal (畫面)
+            // - 重新發出請求
+
             const Loading = ({ isLoading }) => {
               return (
                 <div
@@ -92,10 +102,28 @@
               const [ratelimitRemaining, setRatelimitRemaining] = useState(50);
               const isLoadingRef = useRef(false);
               const [isLoading, setIsLoading] = useState(false);
+              const [photoUrl, setPhotoUrl] = useState(false);
               const currentPage = useRef(1);
+              const modalRef = useRef(null);
+              const myModal = useRef(null);
+
               const onSearchHandler = (e) => {
                 if (e.key === "Enter") {
                   setFilterString(e.target.value);
+                }
+              };
+
+              const getSinglePhoto = async (id) => {
+                const api = "https://api.unsplash.com/photos/";
+                try {
+                  const result = await axios(
+                    `${api}${id}?client_id=${accessKey}`
+                  );
+                  console.log(result);
+                  setPhotoUrl(result.data.urls.regular);
+                  myModal.current.show();
+                } catch (error) {
+                  console.log(error);
                 }
               };
 
@@ -159,6 +187,11 @@
                 }
               }, [isLoading]);
 
+              useEffect(() => {
+                myModal.current = new bootstrap.Modal(modalRef.current);
+                // myModal.current.show();
+              }, []);
+
               return (
                 <div>
                   <Loading isLoading={isLoading} />
@@ -170,9 +203,14 @@
                   <div className="row row-cols-2 g-3" ref={listRef}>
                     {jsonData.map((item) => (
                       <div className="col" key={item.id}>
-                        <Card item={item} />
+                        <Card item={item} getSinglePhoto={getSinglePhoto} />
                       </div>
                     ))}
+                  </div>
+                  <div className="modal" tabIndex="-1" ref={modalRef}>
+                    <div className="modal-dialog">
+                      <img src={photoUrl} alt="" width="100%" />
+                    </div>
                   </div>
                 </div>
               );
