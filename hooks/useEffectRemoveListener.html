@@ -68,12 +68,15 @@
               );
             };
 
-            let currentPage = 1;
+            // let currentPage = 1;
             const App = () => {
               const [filterString, setFilterString] = useState("animal");
               const [jsonData, setJsonData] = useState([]);
+              // const [isLoading, setIsLoading] = useState(false);
+              const isLoading = useRef(false);
+              const currentPage = useRef(1);
               const onSearchHandler = (e) => {
-                console.log(e);
+                // console.log(e);
                 if (e.key === "Enter") {
                   setFilterString(e.target.value);
                 }
@@ -83,20 +86,62 @@
               // #1 搜尋會做調整 keyPress(Enter)
               // #2 把 getPhoto,取得特定頁數
               // #3 加入滾動事件,滾動到列表下方時,取得一比新的
+              // #4 修正過度觸發的問題 => 加入讀取
 
+              const getPhoto = async (page = 1) => {
+                try {
+                  // 搜尋特定需要加入 query
+                  isLoading.current = true;
+                  const result = await axios.get(
+                    `${api}?client_id=${accessKey}&query=${filterString}&page=${page}`
+                  );
+                  console.log(result);
+                  // setJsonData(result.data.results); //當前是不斷覆蓋
+                  // setJsonData([...jsonData, ...result.data.results]);//window.scroll 屬於外部事件 無法取得當前資料 需用callback function
+                  setJsonData((preData) => {
+                    console.log("更新資料觸發");
+                    return [...preData, ...result.data.results];
+                  });
+                  setTimeout(() => {
+                    isLoading.current = false;
+                  }, 1000);
+                } catch (error) {
+                  console.log(error);
+                }
+              };
+
+              const listRef = useRef(null);
               useEffect(() => {
-                (async () => {
-                  try {
-                    // 搜尋特定需要加入 query
-                    const result = await axios.get(
-                      `${api}?client_id=${accessKey}&query=${filterString}`
-                    );
-                    console.log(result);
-                    setJsonData(result.data.results);
-                  } catch (error) {
-                    console.log(error);
+                getPhoto();
+
+                //滾動監聽
+                window.addEventListener("scroll", () => {
+                  // console.log("scroll", window.scrollY); //垂直滾動的位置
+                  // console.dir(listRef.current);
+                  const height =
+                    listRef.current.offsetHeight +
+                    listRef.current.offsetTop -
+                    window.innerHeight;
+                  // console.log(height);
+                  if (!isLoading.current && window.scrollY > height) {
+                    //需要滾動到下方,並沒有在讀取中
+                    currentPage.current++;
+                    getPhoto(currentPage.current); //應該是頁數增加 1
                   }
-                })();
+                });
+
+                // (async () => {
+                //   try {
+                //     // 搜尋特定需要加入 query
+                //     const result = await axios.get(
+                //       `${api}?client_id=${accessKey}&query=${filterString}`
+                //     );
+                //     console.log(result);
+                //     setJsonData(result.data.results);
+                //   } catch (error) {
+                //     console.log(error);
+                //   }
+                // })();
               }, [filterString]);
 
               return (
@@ -105,7 +150,7 @@
                     onSearchHandler={onSearchHandler}
                     filterString={filterString}
                   />
-                  <div className="row row-cols-2 g-3">
+                  <div className="row row-cols-2 g-3" ref={listRef}>
                     {jsonData.map((item) => (
                       <div className="col" key={item.id}>
                         <Card item={item} />
