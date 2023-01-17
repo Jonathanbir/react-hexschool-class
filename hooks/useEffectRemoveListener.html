@@ -88,7 +88,13 @@
               // #3 加入滾動事件,滾動到列表下方時,取得一比新的
               // #4 修正過度觸發的問題 => 加入讀取
 
-              const getPhoto = async (page = 1) => {
+              //  取得的新資料 居然再第二頁
+              // 新取得的 AJAX,還是舊的 animal
+
+              // #5 輸入文字,資料狀態呈現正確
+              // #6 確保監聽事件是正常的
+
+              const getPhoto = async (page = 1, isNew = true) => {
                 try {
                   // 搜尋特定需要加入 query
                   isLoading.current = true;
@@ -100,8 +106,12 @@
                   // setJsonData([...jsonData, ...result.data.results]);//window.scroll 屬於外部事件 無法取得當前資料 需用callback function
                   setJsonData((preData) => {
                     console.log("更新資料觸發");
+                    if (isNew) {
+                      return [...result.data.results];
+                    }
                     return [...preData, ...result.data.results];
                   });
+                  currentPage.current = page; //每次都需要確認當前
                   setTimeout(() => {
                     isLoading.current = false;
                   }, 1000);
@@ -112,11 +122,10 @@
 
               const listRef = useRef(null);
               useEffect(() => {
-                getPhoto();
+                getPhoto(1, true);
 
-                //滾動監聽
-                window.addEventListener("scroll", () => {
-                  // console.log("scroll", window.scrollY); //垂直滾動的位置
+                const scrollEvent = () => {
+                  console.log("scroll", window.scrollY); //垂直滾動的位置
                   // console.dir(listRef.current);
                   const height =
                     listRef.current.offsetHeight +
@@ -126,10 +135,13 @@
                   if (!isLoading.current && window.scrollY > height) {
                     //需要滾動到下方,並沒有在讀取中
                     currentPage.current++;
-                    getPhoto(currentPage.current); //應該是頁數增加 1
+                    getPhoto(currentPage.current, false); //應該是頁數增加 1
                   }
-                });
+                };
 
+                //滾動監聽
+                window.addEventListener("scroll", scrollEvent);
+                return () => window.removeEventListener("scroll", scrollEvent); //滾動事件移除
                 // (async () => {
                 //   try {
                 //     // 搜尋特定需要加入 query
