@@ -69,14 +69,29 @@
 
             // #1 剩餘次數
             // #2 讀取效果
+            // - 製作畫面的讀取效果
+            // - 套用狀態
             // #3 取得單張照片,並顯示在畫面上
+            const Loading = ({ isLoading }) => {
+              return (
+                <div
+                  className="loading"
+                  style={{ display: isLoading ? "flex" : "none" }}
+                >
+                  <div className="spinner-border" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                  </div>
+                </div>
+              );
+            };
 
             const App = () => {
               const [filterString, setFilterString] = useState("animal");
               const [jsonData, setJsonData] = useState([]);
               // const [isLoading, setIsLoading] = useState(false);
               const [ratelimitRemaining, setRatelimitRemaining] = useState(50);
-              const isLoading = useRef(false);
+              const isLoadingRef = useRef(false);
+              const [isLoading, setIsLoading] = useState(false);
               const currentPage = useRef(1);
               const onSearchHandler = (e) => {
                 if (e.key === "Enter") {
@@ -87,7 +102,8 @@
               const getPhotos = async (page = 1, isNew = true) => {
                 try {
                   // 搜尋特定需要加入 query
-                  isLoading.current = true;
+                  isLoadingRef.current = true;
+                  setIsLoading(true);
                   const result = await axios.get(
                     `${api}?client_id=${accessKey}&query=${filterString}&page=${page}`
                   );
@@ -104,7 +120,8 @@
                   );
                   currentPage.current = page; // 每次都需要確認當前頁
                   setTimeout(() => {
-                    isLoading.current = false;
+                    isLoadingRef.current = false;
+                    setIsLoading(false);
                   }, 500);
                 } catch (error) {
                   console.log(error);
@@ -133,8 +150,18 @@
                 return () => window.removeEventListener("scroll", scrollEvent);
               }, [filterString]);
 
+              useEffect(() => {
+                const body = document.querySelector("body");
+                if (isLoading) {
+                  body.style.overflow = "hidden";
+                } else {
+                  body.style.overflow = "auto";
+                }
+              }, [isLoading]);
+
               return (
                 <div>
+                  <Loading isLoading={isLoading} />
                   <SearchBox
                     onSearchHandler={onSearchHandler}
                     filterString={filterString}
@@ -160,6 +187,20 @@
             /* CSS 樣式，可以確保圖片不要變形 */
             .img-cover {
               object-fit: cover;
+            }
+
+            .loading {
+              position: fixed;
+              left: 0;
+              right: 0;
+              top: 0;
+              bottom: 0;
+              background-color: rgba(255, 255, 255, 0.25);
+              backdrop-filter: blur(5px);
+              z-index: 9999;
+              /* display: flex; */
+              justify-content: center;
+              align-items: center;
             }
           </style>
           <!-- 🙇🙇練習結束🙇🙇 -->
