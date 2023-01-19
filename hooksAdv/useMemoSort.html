@@ -99,8 +99,10 @@
                   .sort((a, b) =>
                     ascending ? a.price - b.price : b.price - a.price
                   );
+                return filter;
               }, [ascending, search]);
 
+              console.log("filterProducts", filterProducts);
               return (
                 <>
                   升降冪：
